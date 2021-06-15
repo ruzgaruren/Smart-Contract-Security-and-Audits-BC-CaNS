@@ -1,0 +1,1164 @@
+﻿/**
+ *2021-03-01 tarihinde BscScan.com'da doğrulama için gönderildi
+*/
+
+/**
+ *2021-03-01 tarihinde BscScan.com'da doğrulama için gönderildi
+*/
+
+/**
+  
+   #BAL ARISI
+   
+   #LIQ+#RFI+#SHIB+#DOGE = #ARI
+   #SAFEMOON özellikleri:
+   Satış sırasında sonsuza kadar kilitlenmek üzere likidite havuzuna otomatik olarak eklenen %3 ücret
+   Tüm sahiplere %2 ücret otomatik dağıtma
+   Bir kara delik yarattım, böylece #Bee belirteci her işlemde arzda kendini söndürecek
+   %50 Tedarik başlangıçta yakılır.
+   
+ */
+
+pragma sağlamlığı ^ 0 . 6 . 12 ;
+// SPDX-License-Identifier: Lisanssız
+arayüz IERC20 {
+
+    function totalSupply () dış  görünüm  döndürür ( uint256 );
+
+    /**
+     * @dev "Hesap"ın sahip olduğu belirteçlerin miktarını döndürür.
+     */
+    fonksiyon BalanceOf ( adres  hesabı ) dış  görünüm  döndürür ( uint256 );
+
+    /**
+     * @dev Arayanın hesabındaki "tutar" belirteçlerini "alıcı"ya taşır.
+     *
+     * İşlemin başarılı olup olmadığını gösteren bir boole değeri döndürür.
+     *
+     * Bir {Transfer} olayı yayar.
+     */
+    fonksiyon transferi ( alıcı adresi  , uint256 miktarı ) harici dönüşler ( bool );  
+
+    /**
+     * @dev 'sender'ın kullanacağı kalan jeton sayısını verir
+     * {transferFrom} aracılığıyla "sahip" adına harcama yapılmasına izin verilir. Bu
+     * varsayılan olarak sıfır.
+     *
+     * Bu değer, {onay} veya {transferFrom} çağrıldığında değişir.
+     */
+    işlev indirimi ( adres  kitabı , adres  müsrif ) dış  görünümü  verir ( uint256 );
+
+    /**
+     * @dev Arayanın jetonları üzerinde "harcama" payı olarak "tutar"ı ayarlar.
+     *
+     * İşlemin başarılı olup olmadığını gösteren bir boole değeri döndürür.
+     *
+     * ÖNEMLİ: Bu yöntemle bir karşılık değiştirmenin risk taşıdığına dikkat edin.
+     * birisi talihsizlik nedeniyle hem eski hem de yeni ödeneği kullanabilir
+     * işlem siparişi. Bu yarışı azaltmak için olası bir çözüm
+     * koşul, önce harcama yapanın ödeneğini 0'a düşürmek ve
+     * daha sonra istenen değer:
+     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+     *
+     * Bir {Onay} olayı yayar.
+     */
+    işlev onaylamak ( adres  müsrif , uint256  miktar ) dış  döner ( BOOL );
+
+    /**
+     * @dev Şunu kullanarak 'tutar' belirteçlerini 'gönderen'den 'alıcı'ya taşır
+     * ödenek mekanizması. "tutar" daha sonra arayanın ücretinden düşülür.
+     * ödenek.
+     *
+     * İşlemin başarılı olup olmadığını gösteren bir boole değeri döndürür.
+     *
+     * Bir {Transfer} olayı yayar.
+     */
+    işlev transferFrom ( adres  gönderen , adres  alıcı , uint256  miktarı ) dış  döner ( BOOL );
+
+    /**
+     * @dev "değer" belirteçleri bir hesaptan ("gönderen") bir hesaba taşındığında yayılır
+     * başka (`to`).
+     *
+     * "değer"in sıfır olabileceğini unutmayın.
+     */
+    Olay Transferi ( adres  dizine  gelen , adres  endeksli  için , uint256  değeri );
+
+    /**
+     * @dev Bir "sahip" için bir "harcama" ödeneği tarafından belirlendiğinde ortaya çıkar
+     * {onayla} için bir çağrı. "değer" yeni ödenektir.
+     */
+    Olay Onayı ( adres  endeksli  sahibi , adres  endeksli  harcayan , uint256  değeri );
+}
+
+
+
+/**
+ * @dev Eklenen taşma ile Solidity'nin aritmetik işlemleri üzerinde sarmalayıcılar
+ * kontrol eder.
+ *
+* Taşmada Solidity sarmada aritmetik işlemler. Bu kolayca sonuçlanabilir
+ * hatalarda, çünkü programcılar genellikle bir taşmanın bir
+ * üst düzey programlama dillerinde standart davranış olan hata.
+ * 'SafeMath', bir işlem yapıldığında işlemi geri alarak bu sezgiyi geri yükler.
+ *işlem taşar.
+ *
+ * Kontrol edilmeyen işlemler yerine bu kütüphaneyi kullanmak bir bütünü ortadan kaldırır.
+ * hata sınıfı, bu yüzden her zaman kullanmanız önerilir.
+ */
+ 
+kitaplık SafeMath {
+    /**
+     * @dev İki işaretsiz tam sayının eklenmesini döndürür,
+     * taşma.
+     *
+     * Solidity'nin `+' operatörünün muadili.
+     *
+     * Gereksinimler:
+     *
+     * - Ekleme taşamaz.
+     */
+    fonksiyon ekleme ( uint256  a , uint256  b ) dahili  saf  dönüşler ( uint256 ) {
+        uint256 c = a + b;
+        gerektirir (c >= a, "SafeMath: ek taşma" );
+
+        dönüş c;
+    }
+
+    /**
+     * @dev İki işaretsiz tam sayının çıkarılmasını döndürür,
+     * taşma (sonuç negatif olduğunda).
+     *
+     * Solidity'nin `-` operatörünün karşılığı.
+     *
+     * Gereksinimler:
+     *
+     * - Çıkarma taşmaz.
+     */
+    işlev alt ( uint256  a , uint256  b ) dahili  saf  geri dönüşler ( uint256 ) {
+        return  sub (a, b, "SafeMath: çıkarma taşması" );
+    }
+
+    /**
+     * @dev Özel mesaj açıkken geri dönen iki işaretsiz tam sayının çıkarılmasını döndürür
+     * taşma (sonuç negatif olduğunda).
+     *
+     * Solidity'nin `-` operatörünün karşılığı.
+     *
+     * Gereksinimler:
+     *
+     * - Çıkarma taşmaz.
+     */
+    işlev alt ( uint256  a , uint256  b , dize  bellek  errorMessage ) dahili  saf  dönüşler ( uint256 ) {
+        gerektirir (b <= a, errorMessage);
+        uint256 c = a - b;
+
+        dönüş c;
+    }
+
+    /**
+     * @dev İki işaretsiz tam sayının çarpımını döndürür,
+     * taşma.
+     *
+     * Solidity'nin `*` operatörünün muadili.
+     *
+     * Gereksinimler:
+     *
+     * - Çarpma taşmaz.
+     */
+    işlev mul ( uint256  a , uint256  b ) dahili  saf  geri dönüşler ( uint256 ) {
+        // Gaz optimizasyonu: bu, 'a'nın sıfır olmamasını gerektirmekten daha ucuzdur, ancak
+        // 'b' de test edilirse fayda kaybolur.
+        // Bakınız: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
+        if (a ==  0 ) {
+            geri  0 ;
+        }
+
+        uint256 c = a * b;
+        gerektirir (c / a == b, "SafeMath: çarpma taşması" );
+
+        dönüş c;
+    }
+
+    /**
+     * @dev İki işaretsiz tamsayının tamsayı bölümünü döndürür. Geri alınır
+     * sıfıra bölüm. Sonuç sıfıra yuvarlanır.
+     *
+     * Solidity'nin `/` operatörünün karşılığı. Not: bu işlev bir
+     * Solidity iken 'revert' işlem kodu (kalan gaza dokunulmaz)
+     * geri dönmek için geçersiz bir işlem kodu kullanır (kalan tüm gazı tüketir).
+     *
+     * Gereksinimler:
+     *
+     * - Bölen sıfır olamaz.
+     */
+    işlev div ( uint256  a , uint256  b ) dahili  saf  geri dönüşler ( uint256 ) {
+        dönüş  div (a, b, "SafeMath: sıfıra bölme" );
+    }
+
+    /**
+     * @dev İki işaretsiz tamsayının tamsayı bölümünü döndürür. Özel mesaj açıkken geri döner
+     * sıfıra bölüm. Sonuç sıfıra yuvarlanır.
+     *
+     * Solidity'nin `/` operatörünün karşılığı. Not: bu işlev bir
+     * Solidity iken 'revert' işlem kodu (kalan gaza dokunulmaz)
+     * geri dönmek için geçersiz bir işlem kodu kullanır (kalan tüm gazı tüketir).
+     *
+     * Gereksinimler:
+     *
+     * - Bölen sıfır olamaz.
+     */
+    işlev div ( uint256  a , uint256  b , dize  bellek  errorMessage ) dahili  saf  dönüşler ( uint256 ) {
+        gerektirir (b >  0 , errorMessage);
+        uint256 c = a / b;
+        // assert(a == b * c + bir %b); // Bunun tutmadığı bir durum yok
+
+        dönüş c;
+    }
+
+    /**
+     * @dev İki işaretsiz tamsayıyı bölmenin kalanını verir. (işaretsiz tamsayı modulo),
+     * Sıfıra bölündüğünde geri döner.
+     *
+     * Solidity'nin `%` operatörünün karşılığı. Bu işlev bir "geri" kullanır
+     * opcode (geri kalan gaza dokunulmadan) Solidity bir
+     * geri döndürülecek geçersiz işlem kodu (kalan tüm gazı tüketir).
+     *
+     * Gereksinimler:
+     *
+     * - Bölen sıfır olamaz.
+     */
+    function mod ( uint256  a , uint256  b ) dahili  saf  dönüşler ( uint256 ) {
+        dönüş  modu (a, b, "SafeMath: sıfırla modulo" );
+    }
+
+    /**
+     * @dev İki işaretsiz tamsayıyı bölmenin kalanını verir. (işaretsiz tamsayı modulo),
+     * Sıfıra bölündüğünde özel mesajla geri döner.
+     *
+     * Solidity'nin `%` operatörünün karşılığı. Bu işlev bir "geri" kullanır
+     * opcode (geri kalan gaza dokunulmadan) Solidity bir
+     * geri döndürülecek geçersiz işlem kodu (kalan tüm gazı tüketir).
+     *
+     * Gereksinimler:
+     *
+     * - Bölen sıfır olamaz.
+     */
+    işlev modu ( uint256  a , uint256  b , dize  bellek  errorMessage ) dahili  saf  dönüşler ( uint256 ) {
+        gerektirir (b !=  0 , errorMessage);
+        geri bir % b;
+    }
+}
+
+soyut  sözleşme Bağlam {
+    function _msgSender () dahili  görünüm  sanal  geri dönüşler ( ödenecek adres ) {
+         msj'i iade et . gönderen ;
+    }
+
+    function _msgData () dahili  görünüm  sanal  geri dönüşler ( bayt  bellek ) {
+        bu ; // bayt kodu oluşturmadan durum değişebilirliği uyarısını sustur - bkz. https://github.com/ethereum/solidity/issues/2691
+         msj'i iade et . veri ;
+    }
+}
+
+
+/**
+ * @dev Adres türüyle ilgili işlevlerin toplanması
+ */
+kütüphane Adresi {
+    /**
+     * @dev "hesap" bir sözleşme ise true değerini döndürür.
+     *
+     * [ÖNEMLİ]
+     * ====
+     * Bu işlevin döndürdüğü bir adresin olduğunu varsaymak güvenli değildir.
+     * false, harici olarak sahip olunan bir hesaptır (EOA) ve bir sözleşme değildir.
+     *
+     * Diğerlerinin yanı sıra, "isContract" aşağıdakiler için false döndürür
+     * adres türleri:
+     *
+     * - harici olarak sahip olunan bir hesap
+     * - inşaatta bir sözleşme
+     * - bir sözleşmenin oluşturulacağı bir adres
+     * - bir sözleşmenin yaşadığı ancak imha edildiği bir adres
+     * ====
+     */
+    function isContract ( adres  hesabı ) dahili  görünüm  döndürür ( bool ) {
+        // EIP-1052'ye göre 0x0 henüz oluşturulmamış hesaplar için döndürülen değerdir
+        // ve 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470 döndürülür
+        // kodu olmayan hesaplar için, yani `keccak256('')`
+        bytes32 kod karması;
+        bytes32 hesabıHash = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470 ;
+        // solhint-devre dışı-sonraki satır satır içi montaj yok
+        derleme { codehash : =  extcodehash (hesap) }
+        Dönüş (codehash =! accountHash && codehash =!  0x0 );
+    }
+
+    /**
+     * Solidity'nin "aktarımı" için @dev Değiştirme: "miktar" wei gönderir
+     * "alıcı", mevcut tüm gazı iletir ve hataları geri alır.
+     *
+     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] gaz maliyetini artırır
+     * belirli işlem kodlarının, muhtemelen sözleşmelerin 2300 gaz sınırını aşması
+     * 'transfer' ile empoze edilir, bu da onların aracılığıyla para alamamalarını sağlar
+     * "aktarma". {sendValue} bu sınırlamayı kaldırır.
+     *
+     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Daha fazla bilgi edinin].
+     *
+     * ÖNEMLİ: Kontrol "alıcı"ya devredildiği için dikkatli olunmalıdır.
+     * yeniden giriş güvenlik açıkları oluşturmamak için alınmıştır. kullanmayı düşünün
+     * {ReentrancyGuard} veya
+     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
+     */
+    function sendValue ( ödenecek  alıcı adresi , uint256  tutarı ) dahili {
+        require ( adres ( bu .balance >= miktar, "Adres: yetersiz bakiye" );
+
+        // solhint-devre dışı-sonraki satır kaçın-düşük seviyeli çağrılar, çağrı-değerden kaçın
+        ( bool  başarı , ) = alıcı.çağrı{ değer : miktar }( "" );
+        require (başarılı, "Adres: değer gönderilemiyor, alıcı geri dönmüş olabilir" );
+    }
+
+    /**
+     * @dev Düşük seviyeli bir "çağrı" kullanarak bir Solidity işlev çağrısı gerçekleştirir. bir
+     * düz`çağrı`, bir işlev çağrısı için güvenli olmayan bir alternatiftir: bunu kullanın
+     * yerine işlev.
+     *
+     * 'hedef' bir geri alma nedeni ile geri dönerse, bu şekilde balonlanır.
+     * işlevi (normal Solidity işlev çağrıları gibi).
+     *
+     * Ham döndürülen verileri döndürür. Beklenen getiri değerine dönüştürmek için,
+     * https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`] kullanın.
+     *
+     * Gereksinimler:
+     *
+     * - 'hedef' bir sözleşme olmalıdır.
+     * - "veri" ile "hedef" çağrısı geri alınmamalıdır.
+     *
+     * _v3.1._'den beri mevcuttur
+     */
+    function functionCall ( adres  hedefi , bayt  hafıza  verisi ) dahili  dönüşler ( bayt  hafızası ) {
+      dönüş  functionCall (hedef, veri, "Adres: düşük seviyeli arama başarısız" );
+    }
+
+    /**
+     * @dev {xref-Address-functionCall-address-bytes-}[`functionCall`] ile aynı, ancak
+     * "hedef" geri döndüğünde geri dönüş nedeni olarak "errorMessage".
+     *
+     * _v3.1._'den beri mevcuttur
+     */
+    function functionCall ( adres  hedefi , bayt  hafıza  verisi , string  hafıza  errorMessage ) dahili  dönüşler ( bayt  hafızası ) {
+        return  _functionCallWithValue (hedef, veri, 0 , errorMessage);
+    }
+
+    /**
+     * @dev {xref-Address-functionCall-address-bytes-}[`functionCall`] ile aynı,
+     * ama aynı zamanda 'değer' wei'yi 'hedefe' aktarıyor.
+     *
+     * Gereksinimler:
+     *
+     * - çağrı sözleşmesinin en az "değer" değerinde bir ETH bakiyesi olmalıdır.
+     * - çağrılan Solidity işlevi "ödenebilir" olmalıdır.
+     *
+     * _v3.1._'den beri mevcuttur
+     */
+    işlev functionCallWithValue ( adres  hedefi , bayt  bellek  verisi , uint256  değeri ) dahili  dönüşler ( bayt  bellek ) {
+        return  functionCallWithValue (hedef, veri, değer, "Adres: değer içeren düşük düzey çağrı başarısız" );
+    }
+
+    /**
+     * @dev {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`] ile aynı, ancak
+     * "hedef" geri döndüğünde geri dönüş nedeni olarak "errorMessage" ile.
+     *
+     * _v3.1._'den beri mevcuttur
+     */
+    işlev functionCallWithValue ( adres  hedefi , bayt  bellek  verisi , uint256  değeri , dize  belleği  errorMessage ) dahili  dönüşler ( bayt  bellek ) {
+        require ( adres ( this .balance >= value, "Adres: çağrı için yetersiz bakiye" );
+        return  _functionCallWithValue (hedef, veri, değer, errorMessage);
+    }
+
+    function _functionCallWithValue ( adres  hedefi , bayt  bellek  verileri , uint256  weiValue , dize  belleği  errorMessage ) özel  dönüşler ( bayt  bellek ) {
+        require ( isContract (hedef), "Adres: sözleşme dışı çağrı" );
+
+        // solhint-devre dışı-sonraki satırda düşük seviyeli aramalardan kaçın
+        ( bool  başarı , bayt  bellek  dönüş verisi ) = target.call{ değer : weiValue }(veri);
+        eğer (başarılı) {
+            dönüş verisi;
+        } başka {
+            // Geri dönüş nedenini arayın ve varsa onu kabartın
+            if (dönüş verisi uzunluğu  >  0 ) {
+                // Geri dönüş nedenini balonlamanın en kolay yolu, derleme yoluyla bellek kullanmaktır.
+
+                // solhint-devre dışı-sonraki satır satır içi montaj yok
+                montaj {
+                    let returndata_size : =  mload (geri dönüş)
+                    geri al ( ekleyin ( 32 , geri dönüş verisi), geri dönüş verisi_boyutu)
+                }
+            } başka {
+                geri al (hataMesajı);
+            }
+        }
+    }
+}
+
+/**
+ * Temel bir erişim kontrol mekanizması sağlayan @dev Sözleşme modülü, burada
+ * özel erişime izin verilebilecek bir hesap (sahip) var
+ * özel fonksiyonlar.
+ *
+* Varsayılan olarak, sahip hesabı sözleşmeyi dağıtan hesap olacaktır. Bu
+ * daha sonra {transferOwnership} ile değiştirilebilir.
+ *
+* Bu modül kalıtım yoluyla kullanılır. Değiştiriciyi kullanılabilir hale getirecek
+ * Kullanımlarını kısıtlamak için işlevlerinize uygulanabilen "yalnızcaOwner"
+ * Sahip.
+ */
+Sözleşme Ownable olduğunu Bağlam {
+    adres  özel _sahibi;
+    adres  özel _previousOwner;
+    uint256  özel _lockTime;
+
+    Olay OwnershipTransferred ( adres  endeksli  previousOwner , adres  endeksli  yeni_aidiyet );
+
+    /**
+     * @dev Dağıtıcıyı ilk sahip olarak ayarlayan sözleşmeyi başlatır.
+     */
+    yapıcı () dahili {
+        adres msgSender = _msgSender ();
+        _sahibi = msgSender;
+        yayar  Sahiplik Aktarıldı ( adres ( 0 ), msgSender);
+    }
+
+    /**
+     * @dev Geçerli sahibinin adresini döndürür.
+     */
+    işlev sahibi () genel  görünüm  döndürür ( adres ) {
+        geri _sahibi;
+    }
+
+    /**
+     * @dev Sahibi dışında herhangi bir hesap tarafından çağrılırsa atar.
+     */
+    değiştirici yalnızcaOwner () {
+        require (_owner ==  _msgSender (), "Sahip olunabilir: arayan sahip değil" );
+        _;
+    }
+
+     /**
+     * @dev Sözleşmeyi sahipsiz bırakır. aramak mümkün olmayacak
+     * artık sadeceOwner işlevi. Yalnızca mevcut sahibi tarafından çağrılabilir.
+     *
+     * NOT: Mülkiyetten vazgeçmek, sözleşmeyi maliksiz bırakacaktır,
+     * böylece yalnızca sahibine sunulan tüm işlevleri kaldırır.
+     */
+    fonksiyon renounceOwnership () ortak  bir sanal onlyOwner {
+        yayan  OwnershipTransferred (_owner, address ( 0 ));
+        _sahip =  adres ( 0 );
+    }
+
+    /**
+     * @dev Sözleşmenin sahipliğini yeni bir hesaba (`newOwner`) aktarır.
+     * Yalnızca mevcut sahibi tarafından çağrılabilir.
+     */
+    fonksiyon transferOwnership ( adres  yeni_aidiyet ) kamu  sanal onlyOwner {
+        require (newOwner !=  address ( 0 ), "Sahip olunabilir: yeni sahip sıfır adrestir" );
+        yayar  Sahiplik Aktarıldı (_owner, yeniOwner);
+        _sahip = yeniSahip;
+    }
+
+    işlev geUnlockTime () genel  görünüm  döndürür ( uint256 ) {
+        geri _lockTime;
+    }
+
+    //Sözleşmeyi sağlanan süre kadar mal sahibi için kilitler
+    fonksiyon kilidi ( uint256  zaman ) kamu  sanal onlyOwner {
+        _previousOwner = _sahip;
+        _sahip =  adres ( 0 );
+        _lockTime =  şimdi  + zaman;
+        yayan  OwnershipTransferred (_owner, address ( 0 ));
+    }
+    
+    // _lockTime aşıldığında sahip için sözleşmenin kilidini açar
+    işlev kilidi açma () genel  sanal {
+        require (_previousOwner ==  msg . sender , " Kilidi açma izniniz yok");
+        gerektirir ( şimdi  > _lockTime , "Sözleşme 7 güne kadar kilitli" );
+        yayar  Sahiplik Aktarıldı (_owner, _previousOwner);
+        _sahibi = _previousOwner;
+    }
+}
+
+// pragma sağlamlığı >=0.5.0;
+
+arayüz IUniswapV2Factory {
+    event PairCreated ( adres  indeksli  token0 , adres  indeksli  jeton1 , adres  çifti , uint );
+
+    işlev ücreti () dış  görünüm  döndürür ( adres );
+    işlev feToSetter () dış  görünüm  döndürür ( adres );
+
+    işlev getPair ( adres  belirteciA , adres  belirteciB ) dış  görünüm  döndürür ( adres  çifti );
+    işlev allPairs ( uint ) dış  görünüm  döndürür ( adres  çifti );
+    function allPairsLength () dış  görünüm  döndürür ( uint );
+
+    function createPair ( adres  belirteciA , adres  belirteciB ) dış  dönüşler ( adres  çifti );
+
+    fonksiyon setFeeTo ( adres ) harici ;
+    fonksiyon setFeeToSetter ( adres ) harici ;
+}
+
+
+// pragma sağlamlığı >=0.5.0;
+
+arayüz IUniswapV2Pair {
+    Olay Onayı ( adres  endeksli  sahibi , adres  endeksli  harcayan , uint  değeri );
+    Olay Transferi ( adres  dizine  gelen , adres  endeksli  için , uint  değeri );
+
+    işlev adı () harici  saf  dönüşler ( dize  belleği );
+    işlev sembolü () harici  saf  dönüşler ( dize  belleği );
+    işlev ondalık sayıları () harici  saf  dönüşler ( uint8 );
+    function totalSupply () dış  görünüm  döndürür ( uint );
+    function BalanceOf ( adres  sahibi ) dış  görünüm  döndürür ( uint );
+    işlev ödeneği ( adres  sahibi , adres  harcayan ) dış  görünüm  getirileri ( uint );
+
+    işlev onaylama ( adres  harcayan , uint  değeri ) harici  getiriler ( bool );
+    işlev transferi ( adres  için , uint  değeri ) dış  döner ( BOOL );
+    işlev transferFrom ( adres  gelen , adres  için , uint  değeri ) dış  döner ( BOOL );
+
+    işlev DOMAIN_SEPARATOR () dış  görünüm  döndürür ( bytes32 );
+    function PERMIT_TYPEHASH () harici  saf  dönüşler ( bytes32 );
+    işlev nonces ( adres  sahibi ) dış  görünüm  döndürür ( uint );
+
+    işlev izni ( adres  kitabı , adres  müsrif , uint  değeri , uint  tarihi , uint8  v , bytes32  r , bytes32  s ) dış ;
+
+    Etkinlik Nane ( adres  endeksli  gönderen , uint  amount0 , uint  Miktarı1 );
+    Olay Yanık ( adres  endeksli  gönderen , uint  amount0 , uint  Miktarı1 , adres  endeksli  için );
+    olay Takas (
+        adres  indeksli  gönderen ,
+        uint  miktar0In ,
+        uint  miktar1In ,
+        uint  miktar0Çıkış ,
+        uint  miktar1Çıkış ,
+        adres indekslendi
+    );
+    olay Senkronizasyonu ( uint112  rezerv0 , uint112  rezerv1 );
+
+    function MINIMUM_LIQUIDITY () harici  saf  dönüşler ( uint );
+    işlev fabrikası () dış  görünüm  döndürür ( adres );
+    işlev token0 () dış  görünüm  döndürür ( adres );
+    işlev belirteci1 () dış  görünüm  döndürür ( adres );
+    fonksiyon getReserves () dış  görünümü  verir ( uint112  reserve0 , uint112  reserve1 , uint32  blockTimestampLast );
+    işlev price0CumulativeLast () dış  görünüm  döndürür ( uint );
+    function price1CumulativeLast () dış  görünüm  döndürür ( uint );
+    işlev kLast () dış  görünüm  döndürür ( uint );
+
+    işlev nane ( adres  için ) dış  döner ( uint  nakit );
+    işlev yanık ( adres  için ) dış  döner ( uint  amount0 , uint  Miktarı1 );
+    işlev takas ( uint  amount0Out , uint  amount1Out , adres  için , bayt  calldata  veri ) dış ;
+    işlev skim ( adres  için ) harici ;
+    işlev senkronizasyonu () harici ;
+
+    işlev başlatma ( adres , adres ) harici ;
+}
+
+// pragma sağlamlığı >=0.6.2;
+
+arayüz IUniswapV2Router01 {
+    function fabrika () harici  saf  dönüşler ( adres );
+    fonksiyon WETH () harici  saf  dönüşler ( adres );
+
+    function addLiquidity (
+        adres  belirteciA ,
+        adres  belirteciB ,
+        uint  miktarıADesired ,
+        uint  miktarıBDesired ,
+        uint  miktarAMin ,
+        uint  amountBMin ,
+        adres  için ,
+        son teslim tarihi
+    ) dış  getiriler ( uint  miktarA , uint  miktarB , uint  likidite );
+    işlev addLiquidityETH (
+        adres  belirteci ,
+        uint  miktarTokenDesired ,
+        uint  miktarTokenMin ,
+        uint  miktarETHMin ,
+        adres  için ,
+        son teslim tarihi
+    ) dış  ödenecek  getiriler ( uint  miktar Token , uint  miktar ETH , uint  likidite );
+    işlev removeLiquidity (
+        adres  belirteciA ,
+        adres  belirteciB ,
+        uint  likidite ,
+        uint  miktarAMin ,
+        uint  amountBMin ,
+        adres  için ,
+        son teslim tarihi
+    ) dış  getiriler ( uint  miktarA , uint  miktarB );
+    işlev removeLiquidityETH (
+        adres  belirteci ,
+        uint  likidite ,
+        uint  miktarTokenMin ,
+        uint  miktarETHMin ,
+        adres  için ,
+        son teslim tarihi
+    ) harici  getiriler ( uint  miktarToken , uint  miktarETH );
+    işlev removeLiquidityWithPermit (
+        adres  belirteciA ,
+        adres  belirteciB ,
+        uint  likidite ,
+        uint  miktarAMin ,
+        uint  amountBMin ,
+        adres  için ,
+        uint  son tarih ,
+        bool  onaylamaMax , uint8  v , bytes32  r , bytes32 s
+    ) dış  getiriler ( uint  miktarA , uint  miktarB );
+    işlev removeLiquidityETHWithPermit (
+        adres  belirteci ,
+        uint  likidite ,
+        uint  miktarTokenMin ,
+        uint  miktarETHMin ,
+        adres  için ,
+        uint  son tarih ,
+        bool  onaylamaMax , uint8  v , bytes32  r , bytes32 s
+    ) harici  getiriler ( uint  miktarToken , uint  miktarETH );
+    işlev takasExactTokensForTokens (
+        uint  miktarIn ,
+        uint  miktarOutMin ,
+        adres [] çağrı veri  yolu ,
+        adres  için ,
+        son teslim tarihi
+    ) harici  getiriler ( uint [] bellek  miktarları );
+    işlev swapTokensForExactTokens (
+        uint  miktarÇıkış ,
+        uint  miktarInMax ,
+        adres [] çağrı veri  yolu ,
+        adres  için ,
+        son teslim tarihi
+    ) harici  getiriler ( uint [] bellek  miktarları );
+    işlev swapExactETHForTokens ( uint  amountOutMin , adres [] calldata  yolu , adres  için , uint  son )
+        harici
+        ödenebilir
+        döndürür ( uint [] bellek  miktarları );
+    işlev swapTokensForExactETH ( uint  amountOut , uint  amountInMax , adres [] calldata  yolu , adres  için , uint  son )
+        harici
+        döndürür ( uint [] bellek  miktarları );
+    işlev swapExactTokensForETH ( uint  amountIn , uint  amountOutMin , adres [] calldata  yolu , adres  için , uint  son )
+        harici
+        döndürür ( uint [] bellek  miktarları );
+    işlev swapETHForExactTokens ( uint  amountOut , adres [] calldata  yolu , adres  için , uint  son )
+        harici
+        ödenebilir
+        döndürür ( uint [] bellek  miktarları );
+
+    fonksiyon alıntısı ( uint  miktarA , uint  rezervA , uint  rezervB ) harici  saf  getiriler ( uint  miktarB );
+    işlev getAmountOut ( uint  miktarIn , uint  rezervIn , uint  rezervOut ) harici  saf  geri dönüşler ( uint  miktarOut );
+    fonksiyon getAmountIn ( uint  miktarOut , uint  rezervIn , uint  rezervOut ) harici  saf  geri dönüşler ( uint  miktarIn );
+    işlev getAmountsOut ( uint  miktarIn , adres [] çağrı veri  yolu ) dış  görünüm  döndürür ( uint [] bellek  miktarları );
+    işlev getAmountsIn ( uint  miktarOut , adres [] çağrı veri  yolu ) dış  görünüm  döndürür ( uint [] bellek  miktarları );
+}
+
+
+
+// pragma sağlamlığı >=0.6.2;
+
+arabirim IUniswapV2Router02 , IUniswapV2Router01'dir {
+    işlev removeLiquidityETHSupportingFeeOnTransferTokens (
+        adres  belirteci ,
+        uint  likidite ,
+        uint  miktarTokenMin ,
+        uint  miktarETHMin ,
+        adres  için ,
+        son teslim tarihi
+    ) dış  getiriler ( uint  miktarETH );
+    işlev removeLiquidityETHWithPermitSupportingFeeOnTransferTokens (
+        adres  belirteci ,
+        uint  likidite ,
+        uint  miktarTokenMin ,
+        uint  miktarETHMin ,
+        adres  için ,
+        uint  son tarih ,
+        bool  onaylamaMax , uint8  v , bytes32  r , bytes32 s
+    ) dış  getiriler ( uint  miktarETH );
+
+    işlev takasExactTokensForTokensSupportingFeeOnTransferTokens (
+        uint  miktarIn ,
+        uint  miktarOutMin ,
+        adres [] çağrı veri  yolu ,
+        adres  için ,
+        son teslim tarihi
+    ) harici ;
+    işlev takasExactETHForTokensSupportingFeeOnTransferTokens (
+        uint  miktarOutMin ,
+        adres [] çağrı veri  yolu ,
+        adres  için ,
+        son teslim tarihi
+    ) dış  borç ;
+    işlev takasExactTokensForETHSupportingFeeOnTransferTokens (
+        uint  miktarIn ,
+        uint  miktarOutMin ,
+        adres [] çağrı veri  yolu ,
+        adres  için ,
+        son teslim tarihi
+    ) harici ;
+}
+
+
+sözleşme SafeMoon is Context, IERC20, Sahip Olunabilir {
+    kullanılarak SafeMath  için uint256;
+    kullanarak Adres  için adresine;
+
+    eşleme ( adres => uint256 ) private _rOwned;
+    eşleme ( adres => uint256 ) private _tOwned;
+    mapping ( address => mapping (adres => uint256) ) private _allowances;
+
+    eşleme ( address => bool ) private _isExcludedFromFee;
+
+    eşleme ( address => bool ) private _isExcluded;
+    adres [] özel _hariç;
+   
+    uint256 özel  sabiti MAX =  ~ uint256 ( 0 );
+    uint256  özel _tToplam = 1000000000  *  10 ** 6  *  10 ** 9 ;
+    uint256  özel _rToplam = (MAKS - (MAKS % _tToplam));
+    uint256  özel _tFeeTotal;
+
+    string  private _name = "SafeMoon" ;
+    string  private _symbol = "SAFEMOON" ;
+    uint8  özel _ondalık sayılar = 9 ;
+    
+    uint256  genel _taxFee = 5 ;
+    uint256  özel _previousTaxFee = _taxFee;
+    
+    uint256  public _liquidityFee = 5 ;
+    uint256  private _previousLiquidityFee = _liquidityFee;
+
+    IUniswapV2Router02 genel değişmez uniswapV2Router;
+genel değişmez uniswapV2Pair     adresini ;
+    
+    bool inSwapAndLiquify;
+    bool  public swapAndLiquifyEnabled = true ;
+    
+    uint256  public _maxTxAmount = 5000000  *  10 ** 6  *  10 ** 9 ;
+    uint256  özel numTokensSellToAddToLiquidity = 500000  *  10 ** 6  *  10 ** 9 ;
+    
+    olay MinTokensBeforeSwapUpdated ( uint256  minTokensBeforeSwap );
+    olay SwapAndLiquifyEnabledUpdated ( bool  etkin );
+    olay SwapAndLiquify (
+        uint256  belirteçleriTakas edildi ,
+        uint256  ethAlınan ,
+        uint256 belirteçleriIntoLiqudity
+    );
+    
+    değiştirici lockTheSwap {
+        inSwapAndLiquify =  true ;
+        _;
+        inSwapAndLiquify =  false ;
+    }
+    
+    yapıcı () genel {
+        _rOwned[ _msgSender ()] = _rTotal;
+        
+        IUniswapV2Router02 _uniswapV2Router =  IUniswapV2Router02 ( 0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F );
+         // Bu yeni belirteç için bir uniswap çifti oluşturun
+        uniswapV2Pair =  IUniswapV2Factory (_uniswapV2Router. fabrika ())
+            . createPair ( adres ( bu ), _uniswapV2Router. WETH ());
+
+        // sözleşme değişkenlerinin geri kalanını ayarla
+        uniswapV2Router = _uniswapV2Router;
+        
+        // sahibi ve bu sözleşmeyi ücretten hariç tut
+        _isExcludedFromFee[ sahip ()] =  true ;
+        _isExcludedFromFee[ adres ( bu )] =  true ;
+        
+        yayan  Aktarım ( adres ( 0 ), _msgSender (), _tTotal);
+    }
+
+    işlev adı () genel  görünüm  döndürür ( dize  belleği ) {
+        geri _name;
+    }
+
+    işlev simgesi () genel  görünüm  döndürür ( dize  belleği ) {
+        geri _symbol;
+    }
+
+    işlev ondalık sayıları () genel  görünüm  döndürür ( uint8 ) {
+        geri _decimals;
+    }
+
+    function totalSupply () genel  görünüm  geçersiz kılma  döndürür ( uint256 ) {
+        dönüş _tToplam;
+    }
+
+    function BalanceOf ( adres  hesabı ) genel  görünüm  geçersiz kılma  iadeleri ( uint256 ) {
+        eğer (_isExcluded[hesap]) _tOwned[hesap] döndürürse ;
+        dönüş  belirteciFromReflection (_rOwned[hesap]);
+    }
+
+    işlev aktarımı ( alıcı adresi  , uint256 miktarı ) genel geçersiz kılma iadeleri ( bool ) {   
+        _transfer ( _msgSender (), alıcı, miktar);
+        return  true ;
+    }
+
+    işlev indirimi ( adres  kitabı , adres  müsrif ) halka  görünüşüdür  geçersiz kılma  döner ( uint256 ) {
+        iade _allowances[sahip][sömürücü];
+    }
+
+    fonksiyonu onaylamak ( adres  müsrif , uint256  miktar ) kamu  geçersiz kılma  döner ( bool ) {
+        _approve ( _msgSender (), harcayan , miktar);
+        return  true ;
+    }
+
+    function transferFrom ( adres  gönderen , adres  alıcı , uint256  miktar ) genel  geçersiz kılma  iadeleri ( bool ) {
+        _transfer (gönderen, alıcı, miktar);
+        _approve (gönderen, _msgSender (), _allowances[gönderici][ _msgSender ()]. sub (tutar, "ERC20: transfer miktarı ödeneği aşıyor" ));
+        return  true ;
+    }
+
+    fonksiyon increaseAllowance ( adres  müsrif , uint256  addedValue ) kamu  sanal  döner ( bool ) {
+        _approve ( _msgSender (), harcayan, _allowances[ _msgSender ()][ sender ]. add (addedValue));
+        return  true ;
+    }
+
+    fonksiyon decreaseAllowance ( adres  müsrif , uint256  subtractedValue ) kamu  sanal  döner ( bool ) {
+        _approve ( _msgSender (), harcayan, _allowances[ _msgSender ()] [ spendender ]. sub (subtractedValue, "ERC20: izin sıfırın altına düşürüldü" ));
+        return  true ;
+    }
+
+    function isExcludedFromReward ( adres  hesabı ) genel  görünüm  döndürür ( bool ) {
+        Dönüş _isExcluded [hesap];
+    }
+
+    function totalFees () genel  görünüm  döndürür ( uint256 ) {
+        geri _tFeeTotal;
+    }
+
+    işlev teslimi ( uint256  tAmount ) public {
+        adres gönderen = _msgSender ();
+        require ( ! _isExcluded[sender], "Hariç tutulan adresler bu işlevi çağıramaz" );
+        ( uint256  rAmount ,,,,,) =  _getValues (tAmount);
+        _rOwned[gönderici] = _rOwned[gönderen]. alt (rAmount);
+        _rToplam = _rToplam. alt (rAmount);
+        _tÜcretToplam = _tÜcretToplam. ekle (tAmount);
+    }
+
+    işlev reflectionFromToken ( uint256  tAmount , BOOL  deductTransferFee ) halka  görünüşüdür  döner ( uint256 ) {
+        gerektirir (tAmount <= _tToplam, "Miktar arzdan az olmalıdır" );
+        if ( ! deductTransferFee) {
+            ( uint256  rAmount ,,,,,) =  _getValues (tAmount);
+            dönüş rAmount;
+        } başka {
+            (, uint256  rTransferAmount ,,,,) =  _getValues (tAmount);
+            geri rTransferAmount;
+        }
+    }
+
+    işlev tokenFromReflection ( uint256  rAmount ) genel  görünüm  döndürür ( uint256 ) {
+        gerektirir (rAmount <= _rTotal, "Miktar toplam yansımalardan az olmalıdır" );
+        uint256 currentRate =   _getRate ();
+        dönmek rAmount. div (currentRate);
+    }
+
+    fonksiyon excludeFromReward ( adres  hesabı ) kamu  onlyOwner () {
+        // require(hesap != 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 'Uniswap yönlendiriciyi dışlayamayız.');
+        require ( ! _isExcluded[hesap], "Hesap zaten hariç tutuldu" );
+        if (_rOwned[hesap] >  0 ) {
+            _tOwned[hesap] =  tokenFromReflection (_rOwned[hesap]);
+        }
+        _isExcluded[hesap] =  doğru ;
+        _hariç tutuldu. itin (hesap);
+    }
+
+    işlev includeInReward ( adres  hesabı ) dış  onlyOwner () {
+        require (_isExcluded[hesap], "Hesap zaten hariç tutuldu" );
+        for ( uint256 i = 0 ; i < _hariç tutulan. uzunluk ; i ++ ) {
+            if (_excluded[i] == hesap) {
+                _hariç tutulan[i] = _hariç tutulan[_hariç tutulan. uzunluk  -  1 ];
+                _tOwned[hesap] =  0 ;
+                _isExcluded[hesap] =  false ;
+                _hariç tutuldu. pop ();
+                ara ;
+            }
+        }
+    }
+        function _transferBothExcluded ( adres  gönderen , adres  alıcı , uint256  tAmount ) özel {
+        ( uint256  rAmount , uint256  rTransferAmount , uint256  rFee , uint256  tTransferAmount , uint256  tFee , uint256  tLiquidity ) =  _getValues (tAmount);
+        _tOwned[gönderici] = _tOwned[gönderen]. alt (tAmount);
+        _rOwned[gönderici] = _rOwned[gönderen]. alt (rAmount);
+        _tOwned[alıcı] = _tOwned[alıcı]. ekle (tTransferAmount);
+        _rOwned[alıcı] = _rOwned[alıcı]. ekle (rTransferAmount);        
+        _takeLiquidity (tLiquidity);
+        _reflectÜcreti (rÜcreti, tÜcreti);
+        yayarlar  Transferi (gönderici, alıcı, tTransferAmount);
+    }
+    
+        işlev hariçFromFee ( adres  hesabı ) yalnızca herkese açıkOwner {
+        _isExcludedFromFee[hesap] =  true ;
+    }
+    
+    işlev includeInFee ( adres  hesabı ) yalnızca herkese açıkOwner {
+        _isExcludedFromFee[hesap] =  false ;
+    }
+    
+    işlev setTaxFeePercent ( uint256  taxFee ) dış  onlyOwner () {
+        _taxFee = vergiFee;
+    }
+    
+    işlev setLiquidityFeePercent ( uint256  liquidityFee ) dış  onlyOwner () {
+        _liquidityFee = likiditeFee;
+    }
+   
+    işlev setMaxTxPercent ( uint256  maxTxPercent ) dış  onlyOwner () {
+        _maxTxAmount = _tToplam. mul (maxTxPercent). div (
+            10 ** 2
+        );
+    }
+
+    function setSwapAndLiquifyEnabled ( bool  _enabled ) public onlyOwner {
+        swapAndLiquifyEnabled = _enabled;
+         SwapAndLiquifyEnabledUpdated (_enabled) yayar ;
+    }
+    
+     //değiştirirken uniswapV2Router'dan ETH almak için
+    almak () harici  borç {}
+
+    function _reflectFee ( uint256  rFee , uint256  tFee ) özel {
+        _rToplam = _rToplam. alt (rÜcret);
+        _tÜcretToplam = _tÜcretToplam. ekle (tÜcret);
+    }
+
+    function _getValues ( uint256  tAmount ) özel  görünüm  döndürür ( uint256 , uint256 , uint256 , uint256 , uint256 , uint256 ) {
+        ( uint256  tTransferAmount , uint256  tFee , uint256  tLiquidity ) =  _getTValues (tAmount);
+        ( uint256  rAmount , uint256  rTransferAmount , uint256  rFee ) =  _getRValues (tAmount, tFee, tLiquidity, _getRate ());
+        dönüş (rAmount, rTransferAmount, rFee, tTransferAmount, tFee, tLiquidity);
+    }
+
+    function _getTValues ( uint256  tAmount ) özel  görünüm  döndürür ( uint256 , uint256 , uint256 ) {
+        uint256 tFee = calculateTaxFee (tAmount);
+        uint256 tLiquidity = calculateLiquidityFee (tAmount);
+        uint256 tTransferAmount = tAmount. alt (tÜcret). alt (tLikidite);
+        dönüş (tTransferAmount, tFee, tLiquidity);
+    }
+
+    function _getRValues ( uint256  tAmount , uint256  tFee , uint256  tLiquidity , uint256  currentRate ) özel  saf  dönüşler ( uint256 , uint256 , uint256 ) {
+        uint256 rAmount = tAmount. mul (currentRate);
+        uint256 rÜcreti = tÜcreti. mul (currentRate);
+        uint256 rLiquidity = tLiquidity. mul (currentRate);
+        uint256 rTransferAmount = rAmount. alt (rÜcret). alt (rLikidite);
+        dönüş (rAmount, rTransferAmount, rFee);
+    }
+
+    function _getRate () özel  görünüm  döndürür ( uint256 ) {
+        ( uint256  rSupply , uint256  tSupply ) =  _getCurrentSupply ();
+        rSupply'ı iade edin. div (tTedarik);
+    }
+
+    function _getCurrentSupply () özel  görünüm  döndürür ( uint256 , uint256 ) {
+        uint256 rSupply = _rToplam;
+        uint256 tSupply = _tToplam;      
+        for ( uint256 i = 0 ; i < _hariç tutulan. uzunluk ; i ++ ) {
+            if (_rOwned[_excluded[i]] > rSupply || _tOwned[_excluded[i]] > tSupply) döndürürse (_rTotal, _tTotal);
+            rTedarik = rArz. sub (_rOwned[_hariç tutulan[i]]);
+            tArz = tArz. sub (_tOwned[_excluded[i]]);
+        }
+        if (rSupply < _rTotal. div (_tTotal)) return (_rTotal, _tTotal);
+        dönüş (rSupply, tSupply);
+    }
+    
+    function _takeLiquidity ( uint256  tLiquidity ) özel {
+        uint256 currentRate =   _getRate ();
+        uint256 rLiquidity = tLiquidity. mul (currentRate);
+        _rOwned[ adres ( bu )] = _rOwned[ adres ( bu )]. ekle (rLiquidity);
+        if (_isExcluded[ adres ( bu )])
+            _tOwned[ adres ( bu )] = _tOwned[ adres ( bu )]. ekle (tLiquidity);
+    }
+    
+    işlev calculateTaxFee ( uint256  _amount ) özel  görünüm  verir ( uint256 ) {
+        dönmek _amount. çok (_taxFee). div (
+            10 ** 2
+        );
+    }
+
+    işlev calculateLiquidityFee ( uint256  _amount ) özel  görünüm  verir ( uint256 ) {
+        dönmek _amount. mul (_liquidityFee). div (
+            10 ** 2
+        );
+    }
+    
+    işlev removeAllFee () özel {
+        if (_taxFee ==  0  && _liquidityFee ==  0 ) dönüş ;
+        
+        _previousTaxFee = _taxFee;
+        _previousLiquidityFee = _liquidityFee;
+        
+        _taxFee =  0 ;
+        _liquidityFee =  0 ;
+    }
+    
+    function restoreAllFee () özel {
+        _taxFee = _previousTaxFee;
+        _liquidityFee = _previousLiquidityFee;
+    }
+    
+    function isExcludedFromFee ( adres  hesabı ) genel  görünüm  döndürür ( bool ) {
+        Dönüş _isExcludedFromFee [hesap];
+    }
+
+    fonksiyon _approve ( adres  sahibi , adres  müsrif , uint256  miktarı ) özel {
+        gerektirir (sahip !=  adres ( 0 ), "ERC20: sıfır adresinden onayla" );
+        require (harcayan !=  adres ( 0 ), "ERC20: sıfır adresine onayla" );
+
+        _allowances[sahip][harcayan] = miktar;
+        yayarlar  Onayı (sahibi, bonkör, tutar);
+    }
+
+    işlev _aktarım (
+        adres  dan ,
+        adres  için ,
+        uint256 miktarı
+    ) özel {
+        gerektirir ( !=  adresinden ( 0 ), "ERC20: sıfır adresinden transfer" );
+        gerektirir ( !=  adres ( 0 ), "ERC20: sıfır adrese transfer" );
+        gerektirir (tutar >  0 , "Transfer miktarı sıfırdan büyük olmalıdır" );
+        if ( !=  sahibinden () &&' den !=  sahip ()'e)
+            gerektirir (tutar <= _maxTxAmount, "Aktarım miktarı maxTxAmount'u aşıyor." );
+
+        // bu sözleşme adresinin minimum sayısı üzerinden token bakiyesidir.
+        // takas + likidite kilidi başlatmamız gereken jetonlar?
+        // ayrıca döngüsel bir likidite olayına da kapılmayın.
+        // ayrıca, gönderen uniswap çiftiyse takas ve sıvılaştırma yapmayın.
+        uint256 ContractTokenBalance = BalanceOf ( adres ( this ));
+        
+        if (contractTokenBalance >= _maxTxAmount)
+        {
+            sözleşmeTokenBalance = _maxTxAmount;
+        }
+        
+        bool overMinTokenBalance = ContractTokenBalance >= numTokensSellToAddToLiquidity;
+        eğer (
+            overMinTokenBalance &&
+            ! inSwapAndLiquify &&
+            from != uniswapV2Pair &&
+            takasAndLiquifyEtkin
+        ) {
+            sözleşmeTokenBalance = numTokensSellToAddToLiquidity;
+            // likidite ekle
+            takasAndLiquify (sözleşmeTokenBalance);
+        }
+        
+        // transferden ücretin düşülmesi gerekip gerekmediğini belirtir
+        bool takeFee = true ;
+        
+        //herhangi bir hesap _isExcludedFromFee hesabına aitse ücreti kaldırın
+        if (_isExcludedFromFee[den] || _isExcludedFromFee[to]){
+            takeFee =  yanlış ;
+        }
+        
+        //transfer tutarı, alacağı vergi, yanık, likidite ücreti
+        _tokenTransfer (den,den,tutar,takeFee);
+    }
+
+    işlev swapAndLiquify ( uint256  contractTokenBalance ) özel lockTheSwap {
+        // sözleşme bakiyesini yarıya bölün
+        uint256 yarısı = sözleşmeTokenBalance. div ( 2 );
+        uint256 otherHalf = ContractTokenBalance. alt (yarım);
+
+        // sözleşmenin mevcut ETH bakiyesini yakalayın.
+        // bu, tam olarak ETH miktarını yakalayabilmemiz içindir.
+        // takas oluşturur ve likidite olayının herhangi bir ETH içermesini sağlamaz.
+        // sözleşmeye manuel olarak gönderildi
+        uint256 initialBalance = adres ( bu .balance;
+
+        // ETH için belirteçleri değiştir
+        swapTokensForEth (yarım); // <- bu, takas+sıvılaştırma tetiklendiğinde ETH -> HATE takasını bozar
+
+        // ne kadar ETH ile takas ettik?
+        uint256 newBalance = adres ( bu .balance. alt (başlangıç ​​Bakiyesi);
+
+        // uniswap'a likidite ekle
+        addLiquidity (otherHalf, newBalance);
+        
+         SwapAndLiquify (yarım, newBalance, otherHalf) yayar ;
+    }
+
+    işlev swapTokensForEth ( uint256  tokenAmount ) özel {
+        // belirtecin uniswap çifti yolunu oluştur -> weth
+        adres [] bellek yolu = yeni  adres []( 2 );
+        yol[ 0 ] =  adres ( bu );
+        yol[ 1 ] = uniswapV2Router. ISLAK ();
+
+        _approve ( adres ( this ), adres (uniswapV2Router), tokenAmount);
+
+        // takası yap
+        uniswapV2Router. takasExactTokensForETHSupportingFeeOnTransferTokens (
+            belirteçMiktar,
+            0 , // herhangi bir miktarda ETH kabul et
+            yol,
+            adres ( bu ),
+            blok . zaman damgası
+        );
+    }
+
+    işlev addLiquidity ( uint256  tokenAmount , uint256  ethAmount ) özel {
+        // olası tüm senaryoları kapsayacak şekilde belirteç aktarımını onaylayın
+        _approve ( adres ( this ), adres (uniswapV2Router), tokenAmount);
+
+        // likiditeyi ekle
+        uniswapV2Router.addLiquidityETH{ değer : ethAmount}(
+            adres ( bu ),
+            belirteçMiktar,
+            0 , // kayma kaçınılmazdır
+            0 , // kayma kaçınılmazdır
+            sahibi (),
+            blok . zaman damgası
+        );
+    }
+
+    // takeFee doğruysa, bu yöntem tüm ücreti almaktan sorumludur
+    function _tokenTransfer ( adres  gönderen , adres  alıcı , uint256  miktar , bool  takeFee ) özel {
+        if ( ! TakeFee)
+            RemoveAllFee ();
+        
+        if (_isExcluded[gönderen] &&  ! _isExcluded[alıcı]) {
+            _transferFromExcluded (gönderen, alıcı, miktar);
+        } else  if ( ! _isExcluded[gönderen] && _isExcluded[alıcı]) {
+            _transferToExcluded (gönderen, alıcı, miktar);
+        } else  if ( ! _isExcluded[gönderen] &&  ! _isExcluded[alıcı]) {
+            _transferStandard (gönderen, alıcı, miktar);
+        } else  if (_isExcluded[gönderen] && _isExcluded[alıcı]) {
+            _transferBothExcluded (gönderen, alıcı, miktar);
+        } başka {
+            _transferStandard (gönderen, alıcı, miktar);
+        }
+        
+        if ( ! TakeFee)
+            restoreAllFee ();
+    }
+
+    function _transferStandard ( adres  gönderen , adres  alıcı , uint256  tAmount ) özel {
+        ( uint256  rAmount , uint256  rTransferAmount , uint256  rFee , uint256  tTransferAmount , uint256  tFee , uint256  tLiquidity ) =  _getValues (tAmount);
+        _rOwned[gönderici] = _rOwned[gönderen]. alt (rAmount);
+        _rOwned[alıcı] = _rOwned[alıcı]. ekle (rTransferAmount);
+        _takeLiquidity (tLiquidity);
+        _reflectÜcreti (rÜcreti, tÜcreti);
+        yayarlar  Transferi (gönderici, alıcı, tTransferAmount);
+    }
+
+    function _transferToExcluded ( adres  gönderen , adres  alıcı , uint256  tAmount ) özel {
+        ( uint256  rAmount , uint256  rTransferAmount , uint256  rFee , uint256  tTransferAmount , uint256  tFee , uint256  tLiquidity ) =  _getValues (tAmount);
+        _rOwned[gönderici] = _rOwned[gönderen]. alt (rAmount);
+        _tOwned[alıcı] = _tOwned[alıcı]. ekle (tTransferAmount);
+        _rOwned[alıcı] = _rOwned[alıcı]. ekle (rTransferAmount);           
+        _takeLiquidity (tLiquidity);
+        _reflectÜcreti (rÜcreti, tÜcreti);
+        yayarlar  Transferi (gönderici, alıcı, tTransferAmount);
+    }
+
+    function _transferFromExcluded ( adres  gönderen , adres  alıcı , uint256  tAmount ) özel {
+        ( uint256  rAmount , uint256  rTransferAmount , uint256  rFee , uint256  tTransferAmount , uint256  tFee , uint256  tLiquidity ) =  _getValues (tAmount);
+        _tOwned[gönderici] = _tOwned[gönderen]. alt (tAmount);
+        _rOwned[gönderici] = _rOwned[gönderen]. alt (rAmount);
+        _rOwned[alıcı] = _rOwned[alıcı]. ekle (rTransferAmount);   
+        _takeLiquidity (tLiquidity);
+        _reflectÜcreti (rÜcreti, tÜcreti);
+        yayarlar  Transferi (gönderici, alıcı, tTransferAmount);
+    }
+
+
+    
+
+}
